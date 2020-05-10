@@ -1,6 +1,15 @@
 #include "Shpere.h"
 
-void Shpere::ShpereMake()
+
+Shpere::Shpere()
+{
+}
+
+Shpere::~Shpere()
+{
+}
+
+void Shpere::ShpereMaker()
 {
 	struct VERTEX {
 		XMVECTOR V;
@@ -13,10 +22,6 @@ void Shpere::ShpereMake()
 	int *indexes;        //球体のインデックスデータを保持する変数
 	int vertex_num = u_max * (v_max + 1);//頂点数の計算
 	int index_num = 2 * v_max * (u_max + 1);//インデックス数の計算
-}
-
-void Shpere::ShpereMaker()
-{
 
 			// 頂点データの作成
 	vertices = new VERTEX[vertex_num];
