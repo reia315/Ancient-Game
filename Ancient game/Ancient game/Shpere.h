@@ -17,8 +17,6 @@ public:
 
 	~Shpere();
 
-	void ShpereMake();
-
 	void ShpereMaker();
 
 };
