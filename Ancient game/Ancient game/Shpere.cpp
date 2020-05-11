@@ -36,6 +36,10 @@ void Shpere::ShpereMaker(ID3D11Device *pDevice, ID3D11Buffer *pVertexBuffer, ID3
 	int index_num = 2 * v_max * (u_max + 1);//インデックス数の計算
 	//---------------------------------------------------------------------
 
+
+	
+
+
 		// 頂点データの作成
 	vertices = new VERTEX[vertex_num];
 	for (int v = 0; v <= v_max; v++) {
@@ -93,5 +97,6 @@ void Shpere::ShpereMaker(ID3D11Device *pDevice, ID3D11Buffer *pVertexBuffer, ID3
 	pDevice->CreateBuffer(&bd_index, &InitData_index, &pIndexBuffer);
 
 
-	return pDevice;
+
+
 }
