@@ -62,64 +62,8 @@ int index_num = 2 * v_max * (u_max + 1);//インデックス数の計算
 //---------------------------------------------------------------------
  float x = 0;
 
-LRESULT CALLBACK WinProc(HWND, UINT, WPARAM, LPARAM);
+//LRESULT CALLBACK WinProc(HWND, UINT, WPARAM, LPARAM);
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR pCmdLine, int nCmdShow) 
-{
-
-	// ウィンドウクラスを登録する
-	WNDCLASS wc = {};
-	wc.lpfnWndProc = WinProc;
-	wc.hInstance = hInstance;
-	wc.lpszClassName = ClassName;
-	RegisterClass(&wc);
-	
-
-	// ウィンドウの作成
-	WHandle = CreateWindow(ClassName, "球体の描画", WIN_STYLE, CW_USEDEFAULT, CW_USEDEFAULT, 1000, 800, NULL, NULL, hInstance, NULL);
-	if (WHandle == NULL) return 0;
-	ShowWindow(WHandle, nCmdShow);
-	
-	// メッセージループの実行
-	MSG msg = { 0 };
-	while (msg.message != WM_QUIT) {
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-		else {
-			// ----- DXの処理 -----
-			float clearColor[4] = { 0.5, 0.5, 0.5, 1 };
-			pDeviceContext->ClearRenderTargetView(pBackBuffer_RTV, clearColor);
-
-			//------------------------------------------------------------------------------------------------
-			// パラメータの計算
-			XMVECTOR eye_pos = XMVectorSet(0.0f, 1.0f, -3.5f, 1.0f);
-			XMVECTOR eye_lookat = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-			XMVECTOR eye_up = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
-			XMMATRIX World = XMMatrixRotationY(x += 0.0);//回転速度
-			XMMATRIX View = XMMatrixLookAtLH(eye_pos, eye_lookat, eye_up);
-			XMMATRIX Proj = XMMatrixPerspectiveFovLH(XM_PIDIV4, (FLOAT)CWIDTH / (FLOAT)CHEIGHT, 0.1f, 110.0f);
-			//--------------------------------------------------------------------------------------------------
-
-			//--------------------------------------------------------------------------------------------------
-			// パラメータの受け渡し
-			D3D11_MAPPED_SUBRESOURCE pdata;
-			CONSTANT_BUFFER cb;
-			cb.mWVP = XMMatrixTranspose(World * View * Proj);
-			pDeviceContext->Map(pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);
-			memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));
-			pDeviceContext->Unmap(pConstantBuffer, 0);
-			//----------------------------------------------------------------------------------------------------
-
-			// 描画実行
-			pDeviceContext->DrawIndexed(index_num, 0, 0);
-			pSwapChain->Present(0, 0);
-		}
-	}
-
-	return 0;
-}
 
 
 LRESULT CALLBACK WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -294,4 +238,62 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		return 0;
 	}
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
+}
+
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR pCmdLine, int nCmdShow) 
+{
+
+	// ウィンドウクラスを登録する
+	WNDCLASS wc = {};
+	wc.lpfnWndProc = WinProc;
+	wc.hInstance = hInstance;
+	wc.lpszClassName = ClassName;
+	RegisterClass(&wc);
+	
+
+	// ウィンドウの作成
+	WHandle = CreateWindow(ClassName, "球体の描画", WIN_STYLE, CW_USEDEFAULT, CW_USEDEFAULT, 1000, 800, NULL, NULL, hInstance, NULL);
+	if (WHandle == NULL) return 0;
+	ShowWindow(WHandle, nCmdShow);
+	
+	// メッセージループの実行
+	MSG msg = { 0 };
+	while (msg.message != WM_QUIT) {
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		else {
+			// ----- DXの処理 -----
+			float clearColor[4] = { 0.5, 0.5, 0.5, 1 };
+			pDeviceContext->ClearRenderTargetView(pBackBuffer_RTV, clearColor);
+
+			//------------------------------------------------------------------------------------------------
+			// パラメータの計算
+			XMVECTOR eye_pos = XMVectorSet(0.0f, 1.0f, -3.5f, 1.0f);
+			XMVECTOR eye_lookat = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+			XMVECTOR eye_up = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
+			XMMATRIX World = XMMatrixRotationY(x += 0.0);//回転速度
+			XMMATRIX View = XMMatrixLookAtLH(eye_pos, eye_lookat, eye_up);
+			XMMATRIX Proj = XMMatrixPerspectiveFovLH(XM_PIDIV4, (FLOAT)CWIDTH / (FLOAT)CHEIGHT, 0.1f, 110.0f);
+			//--------------------------------------------------------------------------------------------------
+
+			//--------------------------------------------------------------------------------------------------
+			// パラメータの受け渡し
+			D3D11_MAPPED_SUBRESOURCE pdata;
+			CONSTANT_BUFFER cb;
+			cb.mWVP = XMMatrixTranspose(World * View * Proj);
+			pDeviceContext->Map(pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);
+			memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));
+			pDeviceContext->Unmap(pConstantBuffer, 0);
+			//----------------------------------------------------------------------------------------------------
+
+			// 描画実行
+			pDeviceContext->DrawIndexed(index_num, 0, 0);
+			pSwapChain->Present(0, 0);
+		}
+	}
+
+	return 0;
 }
