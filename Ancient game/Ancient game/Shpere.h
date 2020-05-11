@@ -15,6 +15,10 @@ public:
 
 	~Shpere();
 
-	void  ShpereMaker();
+	void  ShpereMaker(ID3D11Device *pDevice, ID3D11Buffer *pVertexBuffer, ID3D11Buffer *pIndexBuffer);
+	
 
+private:
+
+	int i{ 0 };
 };
