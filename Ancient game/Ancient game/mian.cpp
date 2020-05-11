@@ -2,15 +2,18 @@
 #include <DirectXMath.h>
 #include <d3d11.h>
 #include <d3dcompiler.h>
-//#include "Shpere.h"
+#include "Shpere.h"
 
 using namespace DirectX;
 
 #pragma comment(lib, "d3d11.lib")//以下二つはメイン関数のある所に一回だけ書けばいい
 #pragma comment(lib, "d3dcompiler.lib")
  
+Shpere p{};
 
 
+
+ 
 
 //----------------------------------------------------
  //一つの頂点情報を格納する構造体
@@ -36,8 +39,6 @@ IDXGISwapChain *pSwapChain;
 ID3D11Device *pDevice;
 ID3D11DeviceContext *pDeviceContext;
    
-
-//-------------------------------------------
 ID3D11RenderTargetView *pBackBuffer_RTV;
 
 ID3D11RasterizerState *pRasterizerState;
@@ -47,7 +48,7 @@ ID3D11PixelShader *pPixelShader;
 ID3D11Buffer *pConstantBuffer;
 ID3D11Buffer *pVertexBuffer;
 ID3D11Buffer *pIndexBuffer;
-//-------------------------------------------
+
 
 
 
@@ -67,6 +68,8 @@ int index_num = 2 * v_max * (u_max + 1);//インデックス数の計算
 
 
 LRESULT CALLBACK WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+
+	
 
 	switch (uMsg) {
 	case WM_CREATE:
@@ -106,7 +109,7 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		vp.Height = CHEIGHT;
 		vp.MinDepth = 0.0f;
 		vp.MaxDepth = 1.0f;
-		vp.TopLeftX = 0;
+		vp.TopLeftX = 2;
 		vp.TopLeftY = 0;
 
 		// シェーダの設定
@@ -125,6 +128,8 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		pCompileVS->Release();
 		pCompilePS->Release();
 
+
+		
 		// 定数バッファの設定(パラメータ受け渡し用)
 		D3D11_BUFFER_DESC cb;
 		cb.ByteWidth = sizeof(CONSTANT_BUFFER);
@@ -135,62 +140,72 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		cb.StructureByteStride = 0;
 		pDevice->CreateBuffer(&cb, NULL, &pConstantBuffer);
 
+		
+
+	//--------------------------------------------------------------------
+		//// 頂点データの作成
+		//vertices = new VERTEX[vertex_num];
+		//for (int v = 0; v <= v_max; v++) {
+		//	for (int u = 0; u < u_max; u++) {
+		//		double theta = XMConvertToRadians(180.0f * v / v_max);
+		//		double phi = XMConvertToRadians(360.0f * u / u_max);
+		//		double x = sin(theta) * cos(phi);
+		//		double y = cos(theta);
+		//		double z = sin(theta) * sin(phi);
+		//		vertices[u_max * v + u].V = XMVectorSet(x, y, z, 1.0f);
+		//	}
+		//	
+		//}
+		////-------------------------------------------------------------------
 
 
-	
-		// 頂点データの作成
-		vertices = new VERTEX[vertex_num];
-		for (int v = 0; v <= v_max; v++) {
-			for (int u = 0; u < u_max; u++) {
-				double theta = XMConvertToRadians(180.0f * v / v_max);
-				double phi = XMConvertToRadians(360.0f * u / u_max);
-				double x = sin(theta) * cos(phi);
-				double y = cos(theta);
-				double z = sin(theta) * sin(phi);
-				vertices[u_max * v + u].V = XMVectorSet(x, y, z, 1.0f);
-			}
-			
-		}
-		
-		// 頂点データ用バッファの設定
-		D3D11_BUFFER_DESC bd_vertex;
-		bd_vertex.ByteWidth = sizeof(VERTEX) * vertex_num;
-		bd_vertex.Usage = D3D11_USAGE_DEFAULT;
-		bd_vertex.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		bd_vertex.CPUAccessFlags = 0;
-		bd_vertex.MiscFlags = 0;
-		bd_vertex.StructureByteStride = 0;
-		D3D11_SUBRESOURCE_DATA InitData_vertex;
-		InitData_vertex.pSysMem = vertices;
-		pDevice->CreateBuffer(&bd_vertex, &InitData_vertex, &pVertexBuffer);
-		
-		// 球体のインデックスデータの作成
-		int i = 0;
-		indexes = new int[index_num];
-		for (int v = 0; v < v_max; v++) {
-			for (int u = 0; u <= u_max; u++) {
-				if (u == u_max) {
-					indexes[i++] = v * u_max;
-					indexes[i++] = (v + 1) * u_max;
-				}
-				else {
-					indexes[i++] = (v * u_max) + u;
-					indexes[i++] = indexes[i - 1] + u_max;
-				}
-			}
-		}
-		
-		// インデックスデータ用バッファの設定
-		D3D11_BUFFER_DESC bd_index;
-		bd_index.ByteWidth = sizeof(int) * index_num;
-		bd_index.Usage = D3D11_USAGE_DEFAULT;
-		bd_index.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		bd_index.CPUAccessFlags = 0;
-		bd_index.MiscFlags = 0;
-		bd_index.StructureByteStride = 0;
-		D3D11_SUBRESOURCE_DATA InitData_index;
-		InitData_index.pSysMem = indexes;
-		pDevice->CreateBuffer(&bd_index, &InitData_index, &pIndexBuffer);
+		////?------------------------------------------------------------------
+		//// 頂点データ用バッファの設定
+		//D3D11_BUFFER_DESC bd_vertex;
+		//bd_vertex.ByteWidth = sizeof(VERTEX) * vertex_num;
+		//bd_vertex.Usage = D3D11_USAGE_DEFAULT;
+		//bd_vertex.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		//bd_vertex.CPUAccessFlags = 0;
+		//bd_vertex.MiscFlags = 0;
+		//bd_vertex.StructureByteStride = 0;
+		//D3D11_SUBRESOURCE_DATA InitData_vertex;
+		//InitData_vertex.pSysMem = vertices;
+		//pDevice->CreateBuffer(&bd_vertex, &InitData_vertex, &pVertexBuffer);
+		////------------------------------------------------------------------
+
+		////------------------------------------------------------------------
+		//// 球体のインデックスデータの作成
+		//int i = 0;
+		//indexes = new int[index_num];
+		//for (int v = 0; v < v_max; v++) {
+		//	for (int u = 0; u <= u_max; u++) {
+		//		if (u == u_max) {
+		//			indexes[i++] = v * u_max;
+		//			indexes[i++] = (v + 1) * u_max;
+		//		}
+		//		else {
+		//			indexes[i++] = (v * u_max) + u;
+		//			indexes[i++] = indexes[i - 1] + u_max;
+		//		}
+		//	}
+		//}
+		////----------------------------------------------------------------
+
+		////-----------------------------------------------------------------
+		//// インデックスデータ用バッファの設定
+		//D3D11_BUFFER_DESC bd_index;
+		//bd_index.ByteWidth = sizeof(int) * index_num;
+		//bd_index.Usage = D3D11_USAGE_DEFAULT;
+		//bd_index.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		//bd_index.CPUAccessFlags = 0;
+		//bd_index.MiscFlags = 0;
+		//bd_index.StructureByteStride = 0;
+		//D3D11_SUBRESOURCE_DATA InitData_index;
+		//InitData_index.pSysMem = indexes;
+		//pDevice->CreateBuffer(&bd_index, &InitData_index, &pIndexBuffer);
+		////-----------------------------------------------------------------
+
+		p.ShpereMaker(pDevice, pVertexBuffer, pIndexBuffer);
 
 		// ラスタライザの設定
 		D3D11_RASTERIZER_DESC rdc = {};
@@ -269,7 +284,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR pCmdLine,
 			float clearColor[4] = { 0.5, 0.5, 0.5, 1 };
 			pDeviceContext->ClearRenderTargetView(pBackBuffer_RTV, clearColor);
 
-			//------------------------------------------------------------------------------------------------
+
 			// パラメータの計算
 			XMVECTOR eye_pos = XMVectorSet(0.0f, 1.0f, -3.5f, 1.0f);
 			XMVECTOR eye_lookat = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
@@ -277,9 +292,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR pCmdLine,
 			XMMATRIX World = XMMatrixRotationY(x += 0.0);//回転速度
 			XMMATRIX View = XMMatrixLookAtLH(eye_pos, eye_lookat, eye_up);
 			XMMATRIX Proj = XMMatrixPerspectiveFovLH(XM_PIDIV4, (FLOAT)CWIDTH / (FLOAT)CHEIGHT, 0.1f, 110.0f);
-			//--------------------------------------------------------------------------------------------------
 
-			//--------------------------------------------------------------------------------------------------
+		
 			// パラメータの受け渡し
 			D3D11_MAPPED_SUBRESOURCE pdata;
 			CONSTANT_BUFFER cb;
@@ -287,8 +301,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR pCmdLine,
 			pDeviceContext->Map(pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);
 			memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));
 			pDeviceContext->Unmap(pConstantBuffer, 0);
-			//----------------------------------------------------------------------------------------------------
-
+	
 			// 描画実行
 			pDeviceContext->DrawIndexed(index_num, 0, 0);
 			pSwapChain->Present(0, 0);
@@ -297,3 +310,5 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR pCmdLine,
 
 	return 0;
 }
+
+
