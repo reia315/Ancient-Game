@@ -140,7 +140,7 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		cb.StructureByteStride = 0;
 		pDevice->CreateBuffer(&cb, NULL, &pConstantBuffer);
 
-		
+	
 
 	//--------------------------------------------------------------------
 		//// 頂点データの作成
@@ -204,7 +204,6 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		//InitData_index.pSysMem = indexes;
 		//pDevice->CreateBuffer(&bd_index, &InitData_index, &pIndexBuffer);
 		////-----------------------------------------------------------------
-
 		p.ShpereMaker(pDevice, pVertexBuffer, pIndexBuffer);
 
 		// ラスタライザの設定
