@@ -6,7 +6,7 @@
 
 using namespace DirectX;
 
-#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "d3d11.lib")//ˆÈ‰º“ñ‚Â‚ÍƒƒCƒ“ŠÖ”‚Ì‚ ‚éŠ‚Éˆê‰ñ‚¾‚¯‘‚¯‚Î‚¢‚¢
 #pragma comment(lib, "d3dcompiler.lib")
  
 
