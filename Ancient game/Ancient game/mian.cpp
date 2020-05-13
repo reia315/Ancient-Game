@@ -2,31 +2,29 @@
 #include <DirectXMath.h>
 #include <d3d11.h>
 #include <d3dcompiler.h>
-#include "Shpere.h"
 
 using namespace DirectX;
 
 #pragma comment(lib, "d3d11.lib")//以下二つはメイン関数のある所に一回だけ書けばいい
 #pragma comment(lib, "d3dcompiler.lib")
  
-Shpere p{};
+
 
 
 
  
+//頂点データのための構造体を定義している
 
-//----------------------------------------------------
  //一つの頂点情報を格納する構造体
 struct VERTEX {
 	XMVECTOR V;
 };
 
-
+//数値を入力して描画する頂点データを作成
 // GPU(シェーダ側)へ送る数値をまとめた構造体
 struct CONSTANT_BUFFER {
 	XMMATRIX mWVP;
 };
-//------------------------------------------------------
 
 #define WIN_STYLE WS_OVERLAPPEDWINDOW
 int CWIDTH;     // クライアント領域の幅
@@ -52,7 +50,6 @@ ID3D11Buffer *pIndexBuffer;
 
 
 
-//--------------------------------------------------------------------
 //球体に関するデータを保持する変数の宣言
 const int u_max = 30;//以下２行球体の縦横の分割数を指定する定数
 const int v_max = 15;
@@ -60,7 +57,6 @@ VERTEX *vertices;    //球体の頂点データを保持する変数
 int *indexes;        //球体のインデックスデータを保持する変数
 int vertex_num = u_max * (v_max + 1);//頂点数の計算
 int index_num = 2 * v_max * (u_max + 1);//インデックス数の計算
-//---------------------------------------------------------------------
  float x = 0;
 
 //LRESULT CALLBACK WinProc(HWND, UINT, WPARAM, LPARAM);
@@ -81,6 +77,8 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		CWIDTH = csize.right;
 		CHEIGHT = csize.bottom;
 
+		//イメージを出力するためのバッファ関数を管理しているところ
+		//出力イメージの大きさや品質、描画先ウィンドウの指定など
 		//スワップチェインの作成
 		DXGI_SWAP_CHAIN_DESC scd = { 0 };
 		scd.BufferCount = 1;
@@ -111,88 +109,84 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		vp.MaxDepth = 1.0f;
 		vp.TopLeftX = 2;
 		vp.TopLeftY = 0;
-
-		// シェーダの設定
-		ID3DBlob *pCompileVS = NULL;
-		ID3DBlob *pCompilePS = NULL;
-		D3DCompileFromFile(L"shader.hlsl", NULL, NULL, "VS", "vs_5_0", NULL, 0, &pCompileVS, NULL);
-		pDevice->CreateVertexShader(pCompileVS->GetBufferPointer(), pCompileVS->GetBufferSize(), NULL, &pVertexShader);
-		D3DCompileFromFile(L"shader.hlsl", NULL, NULL, "PS", "ps_5_0", NULL, 0, &pCompilePS, NULL);
-		pDevice->CreatePixelShader(pCompilePS->GetBufferPointer(), pCompilePS->GetBufferSize(), NULL, &pPixelShader);
-
-		// 頂点レイアウト
-		D3D11_INPUT_ELEMENT_DESC layout[] = {
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		};
-		pDevice->CreateInputLayout(layout, 1, pCompileVS->GetBufferPointer(), pCompileVS->GetBufferSize(), &pVertexLayout);
-		pCompileVS->Release();
-		pCompilePS->Release();
-
-
 		
-		// 定数バッファの設定(パラメータ受け渡し用)
-		D3D11_BUFFER_DESC cb;
-		cb.ByteWidth = sizeof(CONSTANT_BUFFER);
-		cb.Usage = D3D11_USAGE_DYNAMIC;
-		cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		cb.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		cb.MiscFlags = 0;
-		cb.StructureByteStride = 0;
-		pDevice->CreateBuffer(&cb, NULL, &pConstantBuffer);
-
-	
-
-	//--------------------------------------------------------------------
-		//// 頂点データの作成
-		//vertices = new VERTEX[vertex_num];
-		//for (int v = 0; v <= v_max; v++) {
-		//	for (int u = 0; u < u_max; u++) {
-		//		double theta = XMConvertToRadians(180.0f * v / v_max);
-		//		double phi = XMConvertToRadians(360.0f * u / u_max);
-		//		double x = sin(theta) * cos(phi);
-		//		double y = cos(theta);
-		//		double z = sin(theta) * sin(phi);
-		//		vertices[u_max * v + u].V = XMVectorSet(x, y, z, 1.0f);
-		//	}
-		//	
-		//}
-		////-------------------------------------------------------------------
+		
+		// シェーダの設定---------------------------------------------------------------------------------------------------------
+		//ID3DBlob *pCompileVS = NULL;
+		//ID3DBlob *pCompilePS = NULL;
+		//D3DCompileFromFile(L"shader.hlsl", NULL, NULL, "VS", "vs_5_0", NULL, 0, &pCompileVS, NULL);
+		//pDevice->CreateVertexShader(pCompileVS->GetBufferPointer(), pCompileVS->GetBufferSize(), NULL, &pVertexShader);
+		//D3DCompileFromFile(L"shader.hlsl", NULL, NULL, "PS", "ps_5_0", NULL, 0, &pCompilePS, NULL);
+		//pDevice->CreatePixelShader(pCompilePS->GetBufferPointer(), pCompilePS->GetBufferSize(), NULL, &pPixelShader);
+		////
+		//// 頂点レイアウト
+		////構造体VERTEXの内部構成（ここではメンバVの正体が何なのかをDirectXに知らせるための物です）
+		//D3D11_INPUT_ELEMENT_DESC layout[] = {
+		//	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		//};
+		//pDevice->CreateInputLayout(layout, 1, pCompileVS->GetBufferPointer(), pCompileVS->GetBufferSize(), &pVertexLayout);
+		//pCompileVS->Release();
+		//pCompilePS->Release();
 
 
-		////?------------------------------------------------------------------
-		//// 頂点データ用バッファの設定
-		//D3D11_BUFFER_DESC bd_vertex;
-		//bd_vertex.ByteWidth = sizeof(VERTEX) * vertex_num;
-		//bd_vertex.Usage = D3D11_USAGE_DEFAULT;
-		//bd_vertex.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		//bd_vertex.CPUAccessFlags = 0;
-		//bd_vertex.MiscFlags = 0;
-		//bd_vertex.StructureByteStride = 0;
-		//D3D11_SUBRESOURCE_DATA InitData_vertex;
-		//InitData_vertex.pSysMem = vertices;
-		//pDevice->CreateBuffer(&bd_vertex, &InitData_vertex, &pVertexBuffer);
-		////------------------------------------------------------------------
+		//
+		//// 定数バッファの設定(パラメータ受け渡し用)
+		//D3D11_BUFFER_DESC cb;
+		//cb.ByteWidth = sizeof(CONSTANT_BUFFER);
+		//cb.Usage = D3D11_USAGE_DYNAMIC;
+		//cb.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		//cb.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		//cb.MiscFlags = 0;
+		//cb.StructureByteStride = 0;
+		//pDevice->CreateBuffer(&cb, NULL, &pConstantBuffer);
 
-		////------------------------------------------------------------------
-		//// 球体のインデックスデータの作成
-		//int i = 0;
-		//indexes = new int[index_num];
-		//for (int v = 0; v < v_max; v++) {
-		//	for (int u = 0; u <= u_max; u++) {
-		//		if (u == u_max) {
-		//			indexes[i++] = v * u_max;
-		//			indexes[i++] = (v + 1) * u_max;
-		//		}
-		//		else {
-		//			indexes[i++] = (v * u_max) + u;
-		//			indexes[i++] = indexes[i - 1] + u_max;
-		//		}
-		//	}
-		//}
-		////----------------------------------------------------------------
+	   //----------------------------------------------------------------------------------------------------------------------------------
 
-		////-----------------------------------------------------------------
-		//// インデックスデータ用バッファの設定
+		// 頂点データの作成
+		vertices = new VERTEX[vertex_num];
+		for (int v = 0; v <= v_max; v++) {
+			for (int u = 0; u < u_max; u++) {
+				double theta = XMConvertToRadians(180.0f * v / v_max);
+				double phi = XMConvertToRadians(360.0f * u / u_max);
+				double x = sin(theta) * cos(phi);
+				double y = cos(theta);
+				double z = sin(theta) * sin(phi);
+				vertices[u_max * v + u].V = XMVectorSet(x, y, z, 1.0f);
+			}
+			
+		}
+
+		//-----------------------------------------------------------------------------------
+		// 頂点データ用バッファの設定
+	/*	D3D11_BUFFER_DESC bd_vertex;
+		bd_vertex.ByteWidth = sizeof(VERTEX) * vertex_num;
+		bd_vertex.Usage = D3D11_USAGE_DEFAULT;
+		bd_vertex.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		bd_vertex.CPUAccessFlags = 0;
+		bd_vertex.MiscFlags = 0;
+		bd_vertex.StructureByteStride = 0;
+		D3D11_SUBRESOURCE_DATA InitData_vertex;
+		InitData_vertex.pSysMem = vertices;
+		pDevice->CreateBuffer(&bd_vertex, &InitData_vertex, &pVertexBuffer);*/
+		//------------------------------------------------------------------------------------
+		
+		// 球体のインデックスデータの作成
+		int i = 0;
+		indexes = new int[index_num];
+		for (int v = 0; v < v_max; v++) {
+			for (int u = 0; u <= u_max; u++) {
+				if (u == u_max) {
+					indexes[i++] = v * u_max;
+					indexes[i++] = (v + 1) * u_max;
+				}
+				else {
+					indexes[i++] = (v * u_max) + u;
+					indexes[i++] = indexes[i - 1] + u_max;
+				}
+			}
+		}
+	//---------------------------------------------------------------
+		// インデックスデータ用バッファの設定
 		//D3D11_BUFFER_DESC bd_index;
 		//bd_index.ByteWidth = sizeof(int) * index_num;
 		//bd_index.Usage = D3D11_USAGE_DEFAULT;
@@ -203,15 +197,16 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		//D3D11_SUBRESOURCE_DATA InitData_index;
 		//InitData_index.pSysMem = indexes;
 		//pDevice->CreateBuffer(&bd_index, &InitData_index, &pIndexBuffer);
-		////-----------------------------------------------------------------
-		p.ShpereMaker(pDevice, pVertexBuffer, pIndexBuffer);
 
-		// ラスタライザの設定
-		D3D11_RASTERIZER_DESC rdc = {};
-		rdc.FillMode = D3D11_FILL_WIREFRAME;
-		rdc.CullMode = D3D11_CULL_NONE;
-		rdc.FrontCounterClockwise = TRUE;
-		pDevice->CreateRasterizerState(&rdc, &pRasterizerState);
+
+		//// ラスタライザの設定
+		//D3D11_RASTERIZER_DESC rdc = {};
+		//rdc.FillMode = D3D11_FILL_WIREFRAME;
+		//rdc.CullMode = D3D11_CULL_NONE;
+		//rdc.FrontCounterClockwise = TRUE;
+		//pDevice->CreateRasterizerState(&rdc, &pRasterizerState);
+
+		//------------------------------------------------------------
 
 		// ----- パイプラインの構築 -----
 		UINT stride = sizeof(VERTEX);
@@ -230,8 +225,8 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		return 0;
 	}
 	case WM_DESTROY:
-
-		pSwapChain->Release();
+		//------------------------------------------------
+		/*pSwapChain->Release();
 		pDeviceContext->Release();
 		pDevice->Release();
 
@@ -246,8 +241,8 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 		pIndexBuffer->Release();
 
 		delete[] vertices;
-		delete[] indexes;
-
+		delete[] indexes;*/
+		//-------------------------------------------------
 		PostQuitMessage(0);
 		return 0;
 	}
