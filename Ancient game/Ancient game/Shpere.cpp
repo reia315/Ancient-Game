@@ -4,6 +4,8 @@
 Shpere::Shpere(ID3D11Device* device, ID3D11DeviceContext* deviceContext)
 	:m_pDevice{ device }, m_pDeviceContext{deviceContext}
 {
+
+
 	// シェーダの設定
 	ID3DBlob *pCompileVS = NULL;
 	D3DCompileFromFile(L"shader.hlsl", NULL, NULL, "VS", "vs_5_0", NULL, 0, &pCompileVS, NULL);
@@ -88,7 +90,40 @@ Shpere::~Shpere()
 
 void Shpere::ShpereMaker()
 {
+	//描画先の作成
+	ID3D11Texture2D *pbbTex;
+	m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pbbTex);
+	m_pDevice->CreateRenderTargetView(pbbTex, NULL, &m_pBackBuffer_RTV);
+	pbbTex->Release();
+
+	// 頂点データの作成
+	vertices = new VERTEX[vertex_num];
+	for (int v = 0; v <= v_max; v++) {
+		for (int u = 0; u < u_max; u++) {
+			double theta = XMConvertToRadians(180.0f * v / v_max);
+			double phi = XMConvertToRadians(360.0f * u / u_max);
+			double x = sin(theta) * cos(phi);
+			double y = cos(theta);
+			double z = sin(theta) * sin(phi);
+			vertices[u_max * v + u].V = XMVectorSet(x, y, z, 1.0f);
+		}
+
+	}
 
 
-
+	// 球体のインデックスデータの作成
+	int i = 0;
+	indexes = new int[index_num];
+	for (int v = 0; v < v_max; v++) {
+		for (int u = 0; u <= u_max; u++) {
+			if (u == u_max) {
+				indexes[i++] = v * u_max;
+				indexes[i++] = (v + 1) * u_max;
+			}
+			else {
+				indexes[i++] = (v * u_max) + u;
+				indexes[i++] = indexes[i - 1] + u_max;
+			}
+		}
+	}
 }
