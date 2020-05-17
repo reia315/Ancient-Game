@@ -127,3 +127,28 @@ void Shpere::ShpereMaker()
 		}
 	}
 }
+
+void Shpere::ShpereDrawer(int CWIDTH, int CHEIGHT)
+{
+
+
+	// パラメータの計算
+	XMVECTOR eye_pos = XMVectorSet(0.0f, 1.0f, -3.5f, 1.0f);
+	XMVECTOR eye_lookat = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	XMVECTOR eye_up = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
+	XMMATRIX World = XMMatrixRotationY(x += 0.0);//回転速度
+	XMMATRIX View = XMMatrixLookAtLH(eye_pos, eye_lookat, eye_up);
+	XMMATRIX Proj = XMMatrixPerspectiveFovLH(XM_PIDIV4, (FLOAT)CWIDTH / (FLOAT)CHEIGHT, 0.1f, 110.0f);
+
+
+	// パラメータの受け渡し
+	D3D11_MAPPED_SUBRESOURCE pdata;
+	CONSTANT_BUFFER cb;
+	cb.mWVP = XMMatrixTranspose(World * View * Proj);
+	m_pDeviceContext->Map(m_pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);
+	memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));
+	m_pDeviceContext->Unmap(m_pConstantBuffer, 0);
+
+	// 描画実行
+	m_pDeviceContext->DrawIndexed(index_num, 0, 0);
+}
