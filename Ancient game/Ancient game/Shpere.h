@@ -16,6 +16,8 @@ public:
 	~Shpere();
 
 	void  ShpereMaker();
+
+	void ShpereDrawer(int CWIDTH,int CHEIGHT);
 	
 
 private:
@@ -55,4 +57,5 @@ private:
 	int *indexes;        //球体のインデックスデータを保持する変数
 	int vertex_num = u_max * (v_max + 1);//頂点数の計算
 	int index_num = 2 * v_max * (u_max + 1);//インデックス数の計算
+	float x = 0;
 };
