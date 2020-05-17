@@ -59,7 +59,7 @@ const char *ClassName = "Temp_Window";
 //int *indexes;        //球体のインデックスデータを保持する変数
 //int vertex_num = u_max * (v_max + 1);//頂点数の計算
 //int index_num = 2 * v_max * (u_max + 1);//インデックス数の計算
-// float x = 0;
+ //float x = 0;
 // //--------------------------------------------------------------
 
 //LRESULT CALLBACK WinProc(HWND, UINT, WPARAM, LPARAM);
@@ -283,25 +283,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR pCmdLine,
 			pDeviceContext->ClearRenderTargetView(pBackBuffer_RTV, clearColor);
 
 
-			// パラメータの計算
-			XMVECTOR eye_pos = XMVectorSet(0.0f, 1.0f, -3.5f, 1.0f);
-			XMVECTOR eye_lookat = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-			XMVECTOR eye_up = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
-			XMMATRIX World = XMMatrixRotationY(x += 0.0);//回転速度
-			XMMATRIX View = XMMatrixLookAtLH(eye_pos, eye_lookat, eye_up);
-			XMMATRIX Proj = XMMatrixPerspectiveFovLH(XM_PIDIV4, (FLOAT)CWIDTH / (FLOAT)CHEIGHT, 0.1f, 110.0f);
+			//// パラメータの計算
+			//XMVECTOR eye_pos = XMVectorSet(0.0f, 1.0f, -3.5f, 1.0f);
+			//XMVECTOR eye_lookat = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+			//XMVECTOR eye_up = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
+			//XMMATRIX World = XMMatrixRotationY(x += 0.0);//回転速度
+			//XMMATRIX View = XMMatrixLookAtLH(eye_pos, eye_lookat, eye_up);
+			//XMMATRIX Proj = XMMatrixPerspectiveFovLH(XM_PIDIV4, (FLOAT)CWIDTH / (FLOAT)CHEIGHT, 0.1f, 110.0f);
 
 		
-			// パラメータの受け渡し
-			D3D11_MAPPED_SUBRESOURCE pdata;
-			CONSTANT_BUFFER cb;
-			cb.mWVP = XMMatrixTranspose(World * View * Proj);
-			pDeviceContext->Map(pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);
-			memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));
-			pDeviceContext->Unmap(pConstantBuffer, 0);
+			//// パラメータの受け渡し
+			//D3D11_MAPPED_SUBRESOURCE pdata;
+			//CONSTANT_BUFFER cb;
+			//cb.mWVP = XMMatrixTranspose(World * View * Proj);
+			//pDeviceContext->Map(pConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &pdata);
+			//memcpy_s(pdata.pData, pdata.RowPitch, (void*)(&cb), sizeof(cb));
+			//pDeviceContext->Unmap(pConstantBuffer, 0);
 	
-			// 描画実行
-			pDeviceContext->DrawIndexed(index_num, 0, 0);
+			//// 描画実行
+			//pDeviceContext->DrawIndexed(index_num, 0, 0);
 			pSwapChain->Present(0, 0);
 		}
 	}
